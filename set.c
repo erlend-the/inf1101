@@ -30,7 +30,7 @@ set_t *set_create(cmpfunc_t cmpfunc)
    
     set->cmpfunc = cmpfunc; 
 
-    set->list->list_create(cmpfunc);
+    set->list = list_create(cmpfunc);
     
     if(set->list == NULL)
     {
@@ -88,6 +88,9 @@ void set_add(set_t *set, void *elem)
 int set_contains(set_t *set, void *elem)
 {
     if (list_contains(set->list, elem) == 1)
+    {
+        return 1;
+    }
 
     return 0; 
     
@@ -103,21 +106,21 @@ int set_contains(set_t *set, void *elem)
  */
 set_t *set_union(set_t *a, set_t *b)
 {
-
+    set_t *unionset = set_create(a->cmpfunc);
     set_iter_t *iter_a = set_createiter(a);
     set_iter_t *iter_b = set_createiter(b); 
     while(set_hasnext(iter_a))
     {
         void *item_a = set_next(iter_a);
 
-        set_add(unionSet, item_a);
+        set_add(unionset, item_a);
     }
 
     while (set_hasnext(iter_b))
     {
         void *item_b = set_next(iter_b);
 
-        set_add(unionSet, item_b);
+        set_add(unionset, item_b);
       
     }
 
@@ -125,7 +128,7 @@ set_t *set_union(set_t *a, set_t *b)
     set_destroyiter(iter_b); 
 
 
-    return union;
+    return unionset;
 
 }
 
@@ -154,7 +157,7 @@ set_t *set_intersection(set_t *a, set_t *b)
 
     }
     
-    set_destroyiter;
+    set_destroyiter(iter_a);
     return intersection_set; 
 }
 
@@ -169,6 +172,7 @@ set_t *set_difference(set_t *a, set_t *b)
     set_t *difference_set = set_create(a->cmpfunc);
 
     set_t *iter_a = set_createiter(a);
+    set_t *iter_b = set_createiter(b);
     void *item_a = set_next(iter_a);
 
     while (item_a != NULL)
@@ -192,6 +196,7 @@ set_t *set_copy(set_t *set)
     set_t *copied_set = set_create(set->cmpfunc);
     copied_set->issorted = set->issorted;
     set_t *iter = set_createiter(set);
+    void *item = set_next(item);
 
     while (item != NULL)
     {
@@ -205,8 +210,11 @@ set_t *set_copy(set_t *set)
 /*
  * The type of set iterators.
  */
-struct set_iter;
-typedef struct set_iter set_iter_t;
+struct set_iter
+{
+    list_iter_t *iter;
+};
+
 
 /*
  * Creates a new set iterator for iterating over the given set.
@@ -217,7 +225,7 @@ set_iter_t *set_createiter(set_t *set)
     set_sort(set);
     set_iter_t *iterset = malloc(sizeof(set_iter_t));
 
-    if (iter == NULL)
+    if (iterset == NULL)
     {
 	    return NULL;
     }
