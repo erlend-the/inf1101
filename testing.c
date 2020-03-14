@@ -4,8 +4,8 @@
 
 #include "set.h"
 
-#define NUM_TRIES 5
-#define NUM_ITEMS 15000
+#define NUM_TRIES 1
+#define NUM_ITEMS 200
 #define RESULT_DIR "/performancetest/"
 
 int compare_ints(void *a, void *b) {
