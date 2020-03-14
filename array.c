@@ -5,7 +5,7 @@
 // #include "stdlib.h"
 // #include "common.h"
 
-#define MAXIMUM_ITEMS 10000
+#define MAXIMUM_ITEMS 100
 
 struct set
 {
@@ -99,15 +99,15 @@ void set_add(set_t *set, void *elem)
     }
     
 
-    if(set->num_items >= set->max_items)
+    if(set->num_items + 1 >= set->max_items)
     {
     
-        set->array = realloc(set->array, sizeof(set_t)*set->max_items*2);
-        set->max_items = set->max_items*2;   
+        set->array = realloc(set->array, sizeof(void*)*(set->max_items*2));
+        set->max_items *= 2;   
     }
     
     set->array[set->num_items] = elem;
-    set->num_items ++;    
+    set->num_items++;    
 }
 
 /*
