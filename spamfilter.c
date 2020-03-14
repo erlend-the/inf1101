@@ -22,15 +22,16 @@ static set_t *tokenize(char *filename)
 	FILE *f;
 	
 	f = fopen(filename, "r");
-	if (f == NULL) {
+	if (f == NULL) 
+	{
 		perror("fopen");
 		fatal_error("fopen() failed");
 	}
 	tokenize_file(f, wordlist);
 	
 	it = list_createiter(wordlist);
-	while (list_hasnext(it)) {
-		void* tmp = list_next(it); 
+	while (list_hasnext(it)) 
+	{
 		set_add(wordset, list_next(it));		
 	}
 	list_destroyiter(it);
@@ -47,7 +48,8 @@ static void printwords(char *prefix, set_t *words)
 	
 	it = set_createiter(words);
 	printf("%s: ", prefix);
-	while (set_hasnext(it)) {
+	while (set_hasnext(it)) 
+	{
 		printf(" %s", set_next(it));
 	}
 	printf("\n");
@@ -63,7 +65,8 @@ int main(int argc, char **argv)
 {
 	char *spamdir, *nonspamdir, *maildir;
 	
-	if (argc != 4) {
+	if (argc != 4) 
+	{
 		fprintf(stderr, "usage: %s <spamdir> <nonspamdir> <maildir>\n",
 				argv[0]);
 		return 1;
@@ -79,7 +82,7 @@ int main(int argc, char **argv)
 	{
 		char *f =(char *)list_next(iter);
 		set_t *set = tokenize(f);
-		if(spawnwords == NULL) 
+		if(spamwords == NULL) 
 		{
 			spamwords = set;
 			continue;
@@ -94,11 +97,11 @@ int main(int argc, char **argv)
 	list_destroy(list);
 
 	list_t *nonspamlist = find_files("nonspam");
-	list_iter_t *iter = list_createiter(nonspamlist);
+	list_iter_t *list_iter = list_createiter(nonspamlist);
 	set_t *nonspam = NULL;
-	while(list_hasnext(iter))
+	while(list_hasnext(list_iter))
 	{
-		char *f = (char *) list_next(iter);
+		char *f = (char *) list_next(list_iter);
 		set_t *nset = tokenize(f);
 		if(nonspam == NULL)
 		{
@@ -110,27 +113,27 @@ int main(int argc, char **argv)
 		nonspam = unin;
 	}
 	
-	list_destroyiter(iter);
+	list_destroyiter(list_iter);
 	list_destroy(nonspamlist);
 
-	set_t *triggerwords = set_difference(spawnwords, nonspam);
+	set_t *triggerwords = set_difference(spamwords, nonspam);
 
 	list_t *mailfiles = find_files("mail");
 	list_iter_t *mailfileiter = list_createiter(mailfiles);
 	while(list_hasnext(mailfileiter))
 	{
 		char *file = (char*) list_next(mailfileiter); 
-		set_t *file words = tokenize(file);
+		set_t *file_words = tokenize(file);
 		set_t *intersect = set_intersection(file_words,triggerwords);
-		printf("%s CONTAINS %d SPAMWORDS(s) AND IS THEREFO", file, set_size(intersect));
+		printf("%s has %d spamwords(s)", file, set_size(intersect));
 		if(set_size(intersect) > 0)
 		{
-			printf("SPAM");
+			printf(" = spam");
 
 		}
 		else
 		{
-			printf("NOT SPAM");
+			printf(" = not spam");
 		}
 		printf("\n");
 	}
