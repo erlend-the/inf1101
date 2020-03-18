@@ -2,8 +2,7 @@
 #include <stdio.h> 
 #include "list.h"
 #include "set.h" 
-// #include "stdlib.h"
-// #include "common.h"
+
 
 #define MAXIMUM_ITEMS 100
 
@@ -34,6 +33,7 @@ set_t *set_create(cmpfunc_t cmpfunc)
         return NULL;
     }
 
+    
     set->cmpfunc = cmpfunc;
     set->max_items = MAXIMUM_ITEMS;
     set->num_items = 0;
@@ -57,21 +57,25 @@ void set_destroy(set_t *set)
 
 void set_sort(set_t *set)
 {
-    int i, j, min_index; 
+    int i, j;
 
-    for (i=0; i < set->num_items - 1; i++)
+    for (i=0; i < set->num_items; i++)
     {
-        min_index = i;
+        void *tmp;
         
         for (j = i+1; j < set->num_items; j++)
+        {
+            if (set->cmpfunc(set->array[i],set->array[j]) > 0 )
             {
-                if (set->cmpfunc(set->array[min_index],set->array[j]) > 0 )
-                    min_index = j; 
-            }
+                tmp = set->array[i];
+                set->array[i] = set->array[j];
+                set->array[j] = tmp;
 
-            void *tmp = set->array[i];
-            set->array[i] = set->array[min_index];
-            set->array[min_index] = tmp;
+            }
+                  
+        }
+
+        
 
     }
 
@@ -232,7 +236,7 @@ set_t *set_copy(set_t *set)
     
     set_t *iter = set_createiter(set);
    
-    void *item = set_next(item);
+    void *item = set_next(iter);
 
     while (item != NULL)
     {
@@ -280,9 +284,14 @@ void set_destroyiter(set_iter_t *iter)
  */
 int set_hasnext(set_iter_t *iter)
 {
-    int hasnext = iter->current < iter->set->num_items;
-    return hasnext;
+    if (iter->current >= iter->set->num_items) 
+    {
+        return 0;
+    }
+
+    return 1;
 }
+
 
 /*
  * Returns the next element in the sequence represented by the given
