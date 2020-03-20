@@ -205,7 +205,7 @@ set_t *set_copy(set_t *set)
     
     set_t *iter = set_createiter(set);
    
-    void *item = set_next(item);
+    void *item = set_next(iter);
 
     while (item != NULL)
     {
